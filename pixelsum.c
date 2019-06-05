@@ -108,11 +108,11 @@ int wmain(int argc, wchar_t ** argv)
     for(i = 0; i < argc; ++i)
     {
         const size_t utf8len = wcslen(argv[i]) * 3 + 10;
-        utf8argv[i] = (char*)malloc(utf8len);
+        utf8argv[i] = (char*)calloc(utf8len, 1);
         if(!utf8argv[i])
         {
             retcode = 1;
-            fputs("malloc error in wmain\n", stderr);
+            fputs("calloc error in wmain\n", stderr);
             break;
         }
         stbi_convert_wchar_to_utf8(utf8argv[i], utf8len, argv[i]);
