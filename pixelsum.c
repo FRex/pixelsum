@@ -75,7 +75,7 @@ static int my_utf8_main(int argc, char ** argv)
         }
         else
         {
-            printf("%s: %016llX\n", argv[i], hash_fnv1_64(pixels, 4 * x * y));
+            printf("%016llx %s\n", hash_fnv1_64(pixels, 4 * x * y), argv[i]);
             stbi_image_free(pixels);
         }
     }

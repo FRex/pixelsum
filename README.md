@@ -26,7 +26,7 @@ Usage: pixelsum.exe input.png...
 
 ```
 $ pixelsum.exe img.png
-img.png: 9560B80D56ACAE1C
+9560b80d56acae1c img.png
 ```
 
 `test.jpg` is the original, `test.png` was converted using `topng`, `optd.png`
@@ -34,8 +34,8 @@ was optimized using `optipng -o7`, `test.bmp` was resaved using Paint.
 
 ```
 $ pixelsum test.bmp test.png test.jpg optd.png
-test.bmp: DED4BADA98B7346C
-test.png: DED4BADA98B7346C
-test.jpg: DED4BADA98B7346C
-optd.png: DED4BADA98B7346C
+ded4bada98b7346c test.bmp
+ded4bada98b7346c test.png
+ded4bada98b7346c test.jpg
+ded4bada98b7346c optd.png
 ```
