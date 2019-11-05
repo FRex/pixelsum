@@ -3,6 +3,8 @@
 Small C program to load image using [stb](https://github.com/nothings/stb) and
 then hash its pixels with 64 bit [fnv1](http://www.isthe.com/chongo/tech/comp/fnv/).
 
+Optionally uses 1 thread per file via [blawork](https://github.com/FRex/blawork).
+
 See releases on this repo to get a Windows exe made with Pelles C with no `-O2`.
 
 **Warning**: when using Pelles C with `-O2` a certain operation in `stb_image`
@@ -21,6 +23,7 @@ a bmp or jpeg, running [optipng](http://optipng.sourceforge.net/) on a png file,
 ```
 $ pixelsum.exe
 pixelsum.exe - load image pixels as 4 8-bit channels and 64-bit fnv1 hash them
+Info : blawork_implementation_name() = 'C11'
 Usage: pixelsum.exe input.png...
 ```
 
