@@ -37,8 +37,8 @@ static int print_usage(const char * argv0)
 {
     argv0 = filepath_to_filename(argv0);
     fprintf(stderr, "%s - load image pixels as 4 8-bit channels and 64-bit fnv1 hash them\n", argv0);
-    fprintf(stderr, "Info: blawork_implementation_name() = '%s'\n", blawork_implementation_name());
-    fprintf(stderr, "Info: BLA_WMAIN_USING_WMAIN_BOOLEAN = %d\n", BLA_WMAIN_USING_WMAIN_BOOLEAN);
+    fprintf(stderr, "Info : blawork_implementation_name() = '%s'\n", blawork_implementation_name());
+    fprintf(stderr, "Info : BLA_WMAIN_USING_WMAIN_BOOLEAN = %d\n", BLA_WMAIN_USING_WMAIN_BOOLEAN);
     fprintf(stderr, "Usage: %s input.png...\n", argv0);
     return 1;
 }
