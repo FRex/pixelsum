@@ -12,6 +12,10 @@
 #define BLAWORK_IMPL_C11
 #include "blawork.h"
 
+static int my_utf8_main(int argc, char ** argv);
+#define BLA_WMAIN_FUNC my_utf8_main
+#include "blawmain.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -33,7 +37,8 @@ static int print_usage(const char * argv0)
 {
     argv0 = filepath_to_filename(argv0);
     fprintf(stderr, "%s - load image pixels as 4 8-bit channels and 64-bit fnv1 hash them\n", argv0);
-    fprintf(stderr, "Info : blawork_implementation_name() = '%s'\n", blawork_implementation_name());
+    fprintf(stderr, "Info: blawork_implementation_name() = '%s'\n", blawork_implementation_name());
+    fprintf(stderr, "Info: BLA_WMAIN_USING_WMAIN_BOOLEAN = %d\n", BLA_WMAIN_USING_WMAIN_BOOLEAN);
     fprintf(stderr, "Usage: %s input.png...\n", argv0);
     return 1;
 }
@@ -123,51 +128,3 @@ static int my_utf8_main(int argc, char ** argv)
     free(works);
     return ret;
 }
-
-#ifndef _MSC_VER
-
-int main(int argc, char ** argv)
-{
-    return my_utf8_main(argc, argv);
-}
-
-#else
-
-/* for wcslen */
-#include <wchar.h>
-
-int wmain(int argc, wchar_t ** argv)
-{
-    int i, retcode;
-    char ** utf8argv = (char **)calloc(argc + 1, sizeof(char*));
-    if(!utf8argv)
-    {
-        fputs("calloc error in wmain\n", stderr);
-        return 1;
-    }
-
-    retcode = 0;
-    for(i = 0; i < argc; ++i)
-    {
-        const size_t utf8len = wcslen(argv[i]) * 3 + 10;
-        utf8argv[i] = (char*)calloc(utf8len, 1);
-        if(!utf8argv[i])
-        {
-            retcode = 1;
-            fputs("calloc error in wmain\n", stderr);
-            break;
-        }
-        stbi_convert_wchar_to_utf8(utf8argv[i], utf8len, argv[i]);
-    }
-
-    if(retcode == 0)
-        retcode = my_utf8_main(argc, utf8argv);
-
-    for(i = 0; i < argc; ++i)
-        free(utf8argv[i]);
-
-    free(utf8argv);
-    return retcode;
-}
-
-#endif /* _MSC_VER */
