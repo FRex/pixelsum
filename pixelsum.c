@@ -16,6 +16,9 @@ static int my_utf8_main(int argc, char ** argv);
 #define BLA_WMAIN_FUNC my_utf8_main
 #include "blawmain.h"
 
+#define BLASHA1_IMPLEMENTATION
+#include "blasha1.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -36,10 +39,10 @@ static const char * filepath_to_filename(const char * path)
 static int print_usage(const char * argv0)
 {
     argv0 = filepath_to_filename(argv0);
-    fprintf(stderr, "%s - load image pixels as 4 8-bit channels and 64-bit fnv1 hash them\n", argv0);
-    fprintf(stderr, "Info : blawork_implementation_name() = '%s'\n", blawork_implementation_name());
-    fprintf(stderr, "Info : BLA_WMAIN_USING_WMAIN_BOOLEAN = %d\n", BLA_WMAIN_USING_WMAIN_BOOLEAN);
-    fprintf(stderr, "Usage: %s input.png...\n", argv0);
+    fprintf(stderr, "%s - load image pixels as 4 8-bit channels and calculate their sha1 and 64-bit fnv1\n", argv0);
+    fprintf(stderr, "    Info : blawork_implementation_name() = '%s'\n", blawork_implementation_name());
+    fprintf(stderr, "    Info : BLA_WMAIN_USING_WMAIN_BOOLEAN = %d\n", BLA_WMAIN_USING_WMAIN_BOOLEAN);
+    fprintf(stderr, "    Usage: %s input.png...\n", argv0);
     return 1;
 }
 
@@ -71,6 +74,7 @@ struct mywork {
     const char * fname;
     int stbiretnull;
     u64 hash;
+    char sha1hash[41];
 };
 
 static void domywork(void * ptr)
@@ -87,6 +91,7 @@ static void domywork(void * ptr)
     }
 
     work->hash = hash_fnv1_64(pixels, 4 * x * y);
+    blasha1_text(pixels, 4 * x * 4, work->sha1hash);
     stbi_image_free(pixels);
 }
 
@@ -121,7 +126,7 @@ static int my_utf8_main(int argc, char ** argv)
         }
         else
         {
-            printf("%016llx %s\n", works[i].hash, works[i].fname);
+            printf("%016llx%s %s\n", works[i].hash, works[i].sha1hash, works[i].fname);
         }
     }
 
