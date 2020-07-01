@@ -26,7 +26,8 @@ $ pixelsum.exe
 pixelsum.exe - load image pixels as 4 8-bit channels and calculate their sha1 and 64-bit fnv1
     Info : blawork_implementation_name() = 'C11'
     Info : BLA_WMAIN_USING_WMAIN_BOOLEAN = 1
-    Usage: pixelsum.exe input.png...
+    Usage: pixelsum.exe [--space] input.png...
+    --space - separate fnv1 and sha1 in output by space (default = one hex string)
 ```
 
 ```
@@ -49,4 +50,17 @@ c125c1b89b5fe88eea200afc86cd3a1043096223 *test.bmp
 330def315e450a1f728119e0c643cfea1d93a7de *test.png
 369088150cfe4e86667233d4046dafdd941618ca *test.jpg
 4bdfe5fe8acc19c8d9cb5a8c80572c4146d0394c *optd.png
+```
+
+Option `--space` can help separet visually the 64-bit fnv-1 and sha1 parts.
+E.g. with pngs derived from PDFs from [shattered.io](https://shattered.io/)
+which have different pixels with same sha1 but different fnv1.
+```
+$ pixelsum shattered-png-?.png | colors
+cad823d59e013cdfd2449c8988fab48da2960aaabb57a81a659fb04e shattered-png-1.png
+00607af98be22fe7d2449c8988fab48da2960aaabb57a81a659fb04e shattered-png-2.png
+
+$ pixelsum --space shattered-png-?.png | colors
+cad823d59e013cdf d2449c8988fab48da2960aaabb57a81a659fb04e shattered-png-1.png
+00607af98be22fe7 d2449c8988fab48da2960aaabb57a81a659fb04e shattered-png-2.png
 ```

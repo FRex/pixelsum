@@ -42,7 +42,8 @@ static int print_usage(const char * argv0)
     fprintf(stderr, "%s - load image pixels as 4 8-bit channels and calculate their sha1 and 64-bit fnv1\n", argv0);
     fprintf(stderr, "    Info : blawork_implementation_name() = '%s'\n", blawork_implementation_name());
     fprintf(stderr, "    Info : BLA_WMAIN_USING_WMAIN_BOOLEAN = %d\n", BLA_WMAIN_USING_WMAIN_BOOLEAN);
-    fprintf(stderr, "    Usage: %s input.png...\n", argv0);
+    fprintf(stderr, "    Usage: %s [--space] input.png...\n", argv0);
+    fprintf(stderr, "    --space - separate fnv1 and sha1 in output by space (default = one hex string)\n");
     return 1;
 }
 
@@ -97,7 +98,18 @@ static void domywork(void * ptr)
 
 static int my_utf8_main(int argc, char ** argv)
 {
-    int i, ret;
+    int i, ret, insertspace;
+
+    insertspace = 0;
+
+    /* check for --space opt and adjust argv0, argc and argv to skipt it if present */
+    if(argc >= 2 && 0 == strcmp("--space", argv[1]))
+    {
+        insertspace = 1;
+        argv[1] = argv[0];
+        ++argv;
+        --argc;
+    } /* if --space opt */
 
     if(argc < 2)
         return print_usage(argv[0]);
@@ -126,7 +138,12 @@ static int my_utf8_main(int argc, char ** argv)
         }
         else
         {
-            printf("%016llx%s %s\n", works[i].hash, works[i].sha1hash, works[i].fname);
+            printf("%016llx%s%s %s\n",
+                works[i].hash,
+                insertspace ? " " : "",
+                works[i].sha1hash,
+                works[i].fname
+            );
         }
     }
 
