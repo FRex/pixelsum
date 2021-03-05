@@ -26,13 +26,14 @@ lost any pixel data. E.g. running [FRex/topng](https://github.com/FRex/topng) on
 a bmp or jpeg, running [optipng](http://optipng.sourceforge.net/) on a png file, etc.
 
 ```
-$ pixelsum.exe
+$ pixelsum
 pixelsum.exe - load image pixels as 4 8-bit channels and calculate their sha1 and 64-bit fnv1
     Info : blawork_implementation_name() = 'WINAPI'
     Info : BLA_WMAIN_USING_WMAIN_BOOLEAN = 1
     Info : 64-bit executable
-    Usage: pixelsum.exe [--space] input.png...
-    --space - separate fnv1 and sha1 in output by space (default = one hex string)
+    Usage: pixelsum.exe [options..] input.png...
+       --space - separate fnv1 and sha1 in output by space (default = one hex string)
+       --alpha - consider pixels with alpha = 0 to be equal no matter their RGB
 ```
 
 ```
@@ -68,4 +69,20 @@ cad823d59e013cdff92d74e3874587aaf443d1db961d4e26dde13e9c shattered-png-1.png
 $ pixelsum --space shattered-png-?.png | colors
 cad823d59e013cdf f92d74e3874587aaf443d1db961d4e26dde13e9c shattered-png-1.png
 00607af98be22fe7 f92d74e3874587aaf443d1db961d4e26dde13e9c shattered-png-2.png
+```
+
+Option `--alpha` makes pixels with alpha equal to 0 compare as equal, even if
+their RGB values are different (the RGB is set to all 0s). Running with this
+option after first running without it allows detecting files that have
+transparent pixels that have non-0 R or G or B values (their checksum will be
+different with this option), and to verify that images are the same except for
+the different colors of transparent pixels.
+```
+$ pixelsum alpha?.png
+6cd8e1a0da55c3253fb5222fe18468d1886aeba65c77b02ea6082b5f alpha1.png
+2c235a22d301a3255c21549c74311495af972997e19b0dcb2be5e80e alpha2.png
+
+$ pixelsum --alpha alpha?.png
+6cd8e1a0da55c3253fb5222fe18468d1886aeba65c77b02ea6082b5f alpha1.png
+6cd8e1a0da55c3253fb5222fe18468d1886aeba65c77b02ea6082b5f alpha2.png
 ```
