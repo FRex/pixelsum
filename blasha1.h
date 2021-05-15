@@ -52,7 +52,14 @@ BLASHA1_PRIV_STATIC_ASSERT(uint64_is_8_bytes, sizeof(blasha1_u64_t) == 8);
 
 static blasha1_u32_t blasha1_priv_bigU32(const blasha1_byte_t * bytes)
 {
-    return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | (bytes[3]);
+    /* casts needed as explained on https://justine.lol/endian.html to not
+    shift an uchar promoted to int left 24 places, it did right thing (movbe
+    or mov + bswap) on gcc and clang but was still UB, with casts it isn't */
+    return
+        (((blasha1_u32_t)bytes[0]) << 24u) |
+        (((blasha1_u32_t)bytes[1]) << 16u) |
+        (((blasha1_u32_t)bytes[2]) << 8u) |
+        (((blasha1_u32_t)bytes[3]));
 }
 
 static blasha1_u32_t blasha1_priv_leftrotate(blasha1_u32_t n, int amount)
