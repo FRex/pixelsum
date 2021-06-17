@@ -34,11 +34,18 @@ pixelsum.exe - load image pixels as 4 8-bit channels and calculate their sha1 an
     Usage: pixelsum.exe [options..] input.png...
        --space - separate fnv1 and sha1 in output by space (default = one hex string)
        --alpha - consider pixels with alpha = 0 to be equal no matter their RGB
+       --count - count distinct RGB values
 ```
 
 ```
 $ pixelsum.exe img.png
 9560b80d56acae1c8691c71c2024eef29d512c960af241c57ad295a0 img.png
+```
+
+Option `--count` counts distinct RGB colors present in the image.
+```
+$ pixelsum.exe --count img.png
+9560b80d56acae1c8691c71c2024eef29d512c960af241c57ad295a0 img.png 65172 colors
 ```
 
 `test.jpg` is the original, `test.png` was converted using `topng`, `optd.png`
