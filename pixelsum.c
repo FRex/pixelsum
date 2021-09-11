@@ -36,6 +36,9 @@ static const char * filepath_to_filename(const char * path)
     return path + lastslash;
 }
 
+/* 4 means show counts for shifts by 0, 1, 2 and 3 */
+#define RGB_SHIFT_COUNT 4
+
 static int print_usage(const char * argv0)
 {
     argv0 = filepath_to_filename(argv0);
@@ -46,7 +49,7 @@ static int print_usage(const char * argv0)
     fprintf(stderr, "    Usage: %s [options..] input.png...\n", argv0);
     fprintf(stderr, "       --space - separate fnv1 and sha1 in output by space (default = one hex string)\n");
     fprintf(stderr, "       --alpha - consider pixels with alpha = 0 to be equal no matter their RGB\n");
-    fprintf(stderr, "       --count - count distinct RGB values\n");
+    fprintf(stderr, "       --count - count distinct RGB values for shifts from 0 to %d (inclusive)\n", RGB_SHIFT_COUNT - 1);
     return 1;
 }
 
@@ -81,9 +84,9 @@ struct mywork {
     int countrgb;
     u64 hash;
     char sha1hash[41];
-    int rgbcount;
+    int rgbcounts[RGB_SHIFT_COUNT];
 
-    /* bit is set if that RGB is present */
+    /* temporary stroage, the bit is set if that RGB is present */
 #define RGBMAP_SIZE ((1 << 24) / 32)
     unsigned rgbmap[RGBMAP_SIZE];
 };
@@ -95,6 +98,29 @@ static int populationCount(unsigned x)
     x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
     x = (x + (x >> 4)) & 0x0f0f0f0f;
     return (x * 0x01010101) >> 24;
+}
+
+static void countColors(struct mywork * work, unsigned char * pixels, int x, int y)
+{
+    int i, shift, r, g, b, rgb;
+
+    for(shift = 0; shift < RGB_SHIFT_COUNT; ++shift)
+    {
+        if(shift > 0)
+            memset(work->rgbmap, 0x0, sizeof(unsigned) * RGBMAP_SIZE);
+
+        for(i = 0; i < 4 * x * y; i += 4)
+        {
+            r = pixels[i + 0] >> shift;
+            g = pixels[i + 1] >> shift;
+            b = pixels[i + 2] >> shift;
+            rgb = (r << 16) + (g << 8) + b;
+            work->rgbmap[rgb / 32] |= 1u << (rgb % 32);
+        } /* for i */
+
+        for(i = 0; i < RGBMAP_SIZE; ++i)
+            work->rgbcounts[shift] += populationCount(work->rgbmap[i]);
+    }
 }
 
 static void domywork(void * ptr)
@@ -124,18 +150,7 @@ static void domywork(void * ptr)
     } /* if work alpha rgb zero */
 
     if(work->countrgb)
-    {
-        int rgb;
-        for(i = 0; i < 4 * x * y; i += 4)
-        {
-            rgb = (pixels[i + 0] << 16) + (pixels[i + 1] << 8) + pixels[i + 2];
-            work->rgbmap[rgb / 32] |= 1u << (rgb % 32);
-        } /* for i */
-
-        work->rgbcount = 0;
-        for(i = 0; i < RGBMAP_SIZE; ++i)
-            work->rgbcount += populationCount(work->rgbmap[i]);
-    }
+        countColors(work, pixels, x, y);
 
     work->hash = hash_fnv1_64(pixels, 4 * x * y);
     blasha1_text(pixels, 4 * x * y, work->sha1hash);
@@ -154,7 +169,7 @@ static int isoption(const char * a)
 
 static int my_utf8_main(int argc, char ** argv)
 {
-    int i, ret, insertspace, alpha0same, countrgb;
+    int i, j, ret, insertspace, alpha0same, countrgb;
 
     insertspace = 0;
     alpha0same = 0;
@@ -219,7 +234,11 @@ static int my_utf8_main(int argc, char ** argv)
             );
 
             if(works[i].countrgb)
-                printf(" %d colors", works[i].rgbcount);
+            {
+                printf(" colors:");
+                for(j = 0; j < RGB_SHIFT_COUNT; ++j)
+                    printf(" %d", works[i].rgbcounts[j]);
+            }
 
             puts("");
         }
